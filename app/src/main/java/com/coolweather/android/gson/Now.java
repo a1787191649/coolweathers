@@ -16,5 +16,12 @@ public class Now {
         public String info;
 
     }
+    public class Wind{
+        @SerializedName("dir")
+        public String direction;
+
+        @SerializedName("sc")
+        public String scale;
+    }
 
 }

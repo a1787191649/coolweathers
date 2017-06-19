@@ -58,6 +58,10 @@ public class WeatherActivity extends AppCompatActivity {
 
     private TextView comfortText;
 
+    private TextView winddirectionText;
+
+    private TextView windforceText;
+
     private TextView carWashText;
 
     private TextView sportText;

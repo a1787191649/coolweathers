@@ -1,10 +1,13 @@
 package com.coolweather.android;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +54,10 @@ public class ChooseAreaFragment extends Fragment {
 
     private ArrayAdapter<String> adapter;
 
+    private SharedPreferences preferences;
+
+    private  String preferenceName = "weathercity";
+
     private List<String> dataList = new ArrayList<>();
 
     /**
@@ -84,6 +91,7 @@ public class ChooseAreaFragment extends Fragment {
     private int currentLevel;
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -99,6 +107,7 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        preferences = getActivity().getSharedPreferences(preferenceName, Context.MODE_PRIVATE);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -124,6 +133,33 @@ public class ChooseAreaFragment extends Fragment {
                 }
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+             if (currentLevel == LEVEL_COUNTY){
+                 final County county = countyList.get(position);
+                 AlertDialog.Builder dialog = new AlertDialog.Builder(getContext())
+                         .setTitle("确认")
+                         .setMessage("确定要将该地区添加关注城市吗？")
+                         .setPositiveButton("关注", new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialogInterface, int i) {
+                                 SharedPreferences.Editor editor = preferences.edit();
+                                 int size = preferences.getAll().size();
+                                 editor.putString("city"+ size,county.getCountyName() + "," + county.getWeatherId());
+                                 editor.commit();
+                             }
+                         });
+                  /* .setNegativeButton("放弃",null)
+                    .create();*/
+                 dialog.show();
+             }
+                return true;
+            }
+
+
+        });
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,6 +172,8 @@ public class ChooseAreaFragment extends Fragment {
         });
         queryProvinces();
     }
+
+
 
     /**
      * 查询全国所有的省，优先从数据库查询，如果没有查询到再去服务器上查询。
